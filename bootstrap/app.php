@@ -9,7 +9,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         function (Router $router) {
             $router->middleware('api')->prefix('api')->group(function () {
-                //
+                require base_path('routes/api/auth.php');
             });
         },
         web: __DIR__ . '/../routes/web.php',
