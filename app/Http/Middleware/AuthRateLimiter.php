@@ -23,8 +23,8 @@ class AuthRateLimiter
         $key = $this->resolveKey($request);
 
         // Rate limit: Allow 5 login attempts per 20 minutes per IP or user
-        $maxAttempts = 5;
-        $decayMinutes = 20; // 20 minutes
+        $maxAttempts = env("AUTH_RATE_LIMITER_MAX_ATTEMPS ");
+        $decayMinutes = env("AUTH_RATE_LIMITRE_DECAY_MINUTES ");
 
         // Check if the user has exceeded the rate limit
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
