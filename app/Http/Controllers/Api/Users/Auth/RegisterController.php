@@ -8,29 +8,42 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Validation\UserValidationRules;
 use Illuminate\Support\Facades\Hash;
-use App\Services\User\UserRegisterService;
+use App\Services\User\UserAuthService;
 
 class RegisterController extends Controller
 {
     use UserValidationRules;
-    use UserRegisterService;
+    use UserAuthService;
 
     public function register(Request $request)
     {
 
+        // Validate Request data
         $request->validate($this->registerRules());
 
+        // Insert new Record
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        $session = $this->insertSessionInfo($request, $user);
-
-        // Generate the token
+        // Generate auth token
         $token = $this->generateToken($user);
 
-        return response()->json(['sucess' => 'User registered successfully', 'user' => $user, 'seesions' => $session, 'token' => $token], 201);
+        // insert new session
+        $session = $this->insertSessionInfo($request, $user, $token);
+
+        // send welcome notification
+        $this->welcomeNotification($user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User registered successfully',
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+            ],
+        ], 201);
     }
 }
