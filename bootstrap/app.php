@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\RequestLogger;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Log;
@@ -31,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
                     'error' => 'Validation Error',
                     'details' => $e->errors(),
                 ], 422);
+            } elseif ($e instanceof AuthenticationException) {
+                return response()->json([
+                    'error' => 'Unauthenticated.',
+                    'message' => 'You must be logged in to access this resource.',
+                ], 401);
             } else {
                 Log::channel('server_errors')->error('Unhandled Exception', [
                     'message' => $e->getMessage(),
