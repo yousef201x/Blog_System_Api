@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Users\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Session;
 use App\Services\User\UserAuthService;
 use Illuminate\Http\Request;
 
@@ -13,19 +12,29 @@ class LogoutController extends Controller
 
     public function logout(Request $request)
     {
-        // Ensure the user is authenticated
-        $user = $request->user();  // This retrieves the authenticated user
 
-        // Invalidate the user's tokens (assuming you're using multiple tokens)
-        $user->tokens()->delete();  // Delete all tokens associated with the user
+        // Retrieve the token from the authenticated user
+        $token = $request->user()->currentAccessToken();
 
-        // Destroy all user sessions
-        $this->destroyAllSessions($user->id);  // Assuming this method deletes sessions for the user
+        // Delete the token
+        $token->delete();
 
         // Return success response
         return response()->json([
             'success' => true,
             'message' => 'Logged out successfully.',
+        ]);
+    }
+
+    public function destroyAllSessions(Request $request)
+    {
+        // Revoke all tokens for the authenticated user
+        $request->user()->tokens()->delete();
+
+        // Return success response
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out from all devices successfully.',
         ]);
     }
 }

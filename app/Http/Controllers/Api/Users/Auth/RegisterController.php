@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Users\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Validation\UserValidationRules;
@@ -29,7 +28,7 @@ class RegisterController extends Controller
         ]);
 
         // Generate auth token
-        $token = $this->generateToken($user);
+        $token = $this->setAuthToken($user);
 
         // insert new session
         $session = $this->insertSessionInfo($request, $user, $token);

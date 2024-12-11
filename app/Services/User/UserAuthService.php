@@ -9,10 +9,12 @@ use App\Notifications\UserRegisteredNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 trait UserAuthService
 {
-    function generateToken(User $user)
+    function setAuthToken(User $user)
     {
         return $user->createToken('Api Token')->plainTextToken;
     }
@@ -22,7 +24,7 @@ trait UserAuthService
         $session = new Session;
         $session->id = session()->getId();
         $session->user_id = $user->id;
-        $session->valid_token = $token;
+        $session->valid_token = Hash::make($token);
         $session->ip_address = $request->ip();
         $session->user_agent = $request->userAgent();
         $session->last_activity = Carbon::now()->format('Y-m-d H:i:s');

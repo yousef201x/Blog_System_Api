@@ -34,7 +34,7 @@ class LoginController extends Controller
         }
 
         // Generate a token for the authenticated user
-        $token = $this->generateToken($user);
+        $token = $this->setAuthToken($user);
 
         $this->insertSessionInfo($request, $user, $token);
 

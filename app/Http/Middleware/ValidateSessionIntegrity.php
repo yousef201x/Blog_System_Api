@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Session;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 
 class ValidateSessionIntegrity
@@ -29,13 +30,15 @@ class ValidateSessionIntegrity
             ->where('valid_token', $token)
             ->first();
 
+        $hashedToken = $storedSession->valid_token;
+
         // Check if a session was found
         if (!$storedSession) {
             return response()->json(['error' => 'Invalid token'], 401);
         }
 
         // Validate IP address and User-Agent
-        if ($storedSession->ip_address !== $request->ip() || $storedSession->user_agent !== $request->userAgent()) {
+        if ($storedSession->ip_address !== $request->ip() || $storedSession->user_agent !== $request->userAgent() || Hash::check($token, $hashedToken)) {
             return response()->json(['error' => 'Session validation failed.'], 403);
         }
 
